@@ -11,7 +11,7 @@ function App() {
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar/>
 
       {/* Main content area with Header and Routes */}
       <div className="flex-1 flex flex-col">

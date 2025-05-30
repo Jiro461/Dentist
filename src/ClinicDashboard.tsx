@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { Search, Filter, Eye, X } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { Search, Filter, Eye} from "lucide-react"
 import { Input } from "./components/ui/input"
 import { Button } from "./components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select"
@@ -61,7 +61,7 @@ export default function PatientList() {
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
   const [showPatientDetail, setShowPatientDetail] = useState(false)
-
+    const filterRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate()
 
   const [filters, setFilters] = useState<FilterCriteria>({
@@ -70,6 +70,19 @@ export default function PatientList() {
     patientCode: "all",
     examDate: "all",
   })
+  useEffect(()=>{
+    const handleClickoutside = (event: MouseEvent) => {
+      if(filterRef.current && !filterRef.current.contains(event.target as Node)){
+        setShowAdvancedFilter(false)
+      }
+    }
+    if(showAdvancedFilter){
+      document.addEventListener("mousedown", handleClickoutside)
+    }
+    return ()=>{
+      document.removeEventListener("mousedown", handleClickoutside)
+    }
+  },[showAdvancedFilter])
 
   const handleBasicSearch = (term: string) => {
     setSearchTerm(term)
@@ -169,14 +182,14 @@ export default function PatientList() {
                 className="pl-10 w-80"
               />
             </div>
-            <Button variant="outline" onClick={() => setShowAdvancedFilter(!showAdvancedFilter)} className="p-2">
-              <Filter className="w-4 h-4" />
+            <Button variant="outline" onClick={() => setShowAdvancedFilter(!showAdvancedFilter)} className="p-2 ">
+              <Filter className="w-4 h-4 " />
             </Button>
           </div>
         </div>
 
         {showAdvancedFilter && (
-          <div className="mb-6 p-4 bg-white border rounded-lg">
+          <div className="absolute  right-10 z-20 w-[60%] mb-6 p-4 bg-white border rounded-lg " ref={filterRef}>
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-4">
@@ -188,6 +201,9 @@ export default function PatientList() {
                       { value: "all", label: "Tất cả" },
                       { value: "Nguyễn Văn An", label: "Nguyễn Văn An" },
                       { value: "Trần Thị Bình", label: "Trần Thị Bình" },
+                      { value: "Lê Minh Châu", label: "Lê Minh Châu" },
+                      { value: "Phạm Quốc Dũng", label: "Phạm Quốc Dũng" },
+                      { value: "Phạm Thị E", label: "Phạm Thị E" },
                     ]}
                   />
 
@@ -216,6 +232,8 @@ export default function PatientList() {
                           { value: "BN001", label: "BN001" },
                           { value: "BN002", label: "BN002" },
                           { value: "BN003", label: "BN003" },
+                          { value: "BN004", label: "BN004" },
+                          { value: "BN005", label: "BN005" },
                         ]}
                       />
                     </div>
