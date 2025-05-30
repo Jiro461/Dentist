@@ -5,13 +5,14 @@ import MedicalRecord from './MedicalResult';
 import Prescription from './Prescription';
 import Appointment from './Appointment';
 import Header from './components/Header'; // Import Header
-import Sidebar from './components/sidebar';
+import Sidebar from './components/Sidebar';
+
 
 function App() {
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar/>
 
       {/* Main content area with Header and Routes */}
       <div className="flex-1 flex flex-col">

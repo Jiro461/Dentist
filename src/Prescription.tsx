@@ -113,6 +113,7 @@ const Prescription = () => {
     setExpandedRow(newId)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateMedication = (id: number, field: string, value: any) => {
     setMedications(medications.map((med) => (med.id === id ? { ...med, [field]: value } : med)))
 

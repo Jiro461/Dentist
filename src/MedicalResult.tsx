@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import type React from "react"
@@ -29,17 +30,17 @@ const MedicalRecord = () => {
   // Ref for scrolling to treatment direction field
   const huongDieuTriRef = useRef<HTMLTextAreaElement>(null)
 // Add this function after the state declarations
-const reloadData = () => {
-    const savedPrescription = localStorage.getItem("prescriptionData")
-    if (savedPrescription) {
-      setPrescriptionData(JSON.parse(savedPrescription))
-    }
+// const reloadData = () => {
+//     const savedPrescription = localStorage.getItem("prescriptionData")
+//     if (savedPrescription) {
+//       setPrescriptionData(JSON.parse(savedPrescription))
+//     }
 
-    const savedAppointment = localStorage.getItem("appointmentData")
-    if (savedAppointment) {
-      setAppointmentData(JSON.parse(savedAppointment))
-    }
-  }
+//     const savedAppointment = localStorage.getItem("appointmentData")
+//     if (savedAppointment) {
+//       setAppointmentData(JSON.parse(savedAppointment))
+//     }
+//   }
   // Load prescription and appointment data from localStorage on component mount
   useEffect(() => {
     const loadData = () => {
