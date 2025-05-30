@@ -7,7 +7,6 @@ import Appointment from './Appointment';
 import Header from './components/Header'; // Import Header
 import Sidebar from './components/Sidebar';
 
-
 function App() {
   return (
     <div className="flex min-h-screen">
