@@ -193,7 +193,7 @@ const MedicalRecord = () => {
         <button className="flex items-center gap-1 text-gray-600 hover:text-gray-800">
           <span>🖨️</span> In
         </button>
-        <button className="flex items-center gap-1 text-gray-600 hover:text-gray-800">
+        <button onClick={() => navigate('/')} className="flex items-center gap-1 text-gray-600 hover:text-gray-800">
           <span>✕</span> Đóng
         </button>
       </div>
@@ -308,19 +308,31 @@ const MedicalRecord = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-4 gap-4">
+                <div className='col-span-1'>
                   <label className="block text-sm font-medium mb-1">
                     Bệnh chính <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <select className="w-full border border-gray-300 rounded px-3 py-2 appearance-none bg-blue-100">
-                      <option>Loét dạ dày</option>
+                    <option>Loét dạ dày</option>
+                    <option>Viêm dạ dày</option>
+                    <option>Trào ngược dạ dày thực quản</option>
+                    <option>Hội chứng ruột kích thích</option>
+                    <option>Viêm đại tràng</option>
+                    <option>Táo bón</option>
+                    <option>Tiêu chảy cấp</option>
+                    <option>Viêm gan B</option>
+                    <option>Viêm gan C</option>
+                    <option>Sỏi mật</option>
+                    <option>Suy gan</option>
+                    <option>Suy thận mạn</option>
+                    <option>Tiểu đường type 2</option>
                     </select>
                     <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
                   </div>
                 </div>
-                <div>
+                <div className='col-span-3'>
                   <label className="block text-sm font-medium mb-1">Mô tả tình trạng</label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
@@ -329,17 +341,35 @@ const MedicalRecord = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-4 gap-4">
+                <div className='col-span-1'>
                   <label className="block text-sm font-medium mb-1">Bệnh phụ</label>
                   <div className="relative">
                     <select className="w-full border border-gray-300 rounded px-3 py-2 appearance-none bg-blue-100">
-                      <option>Thiếu máu</option>
+                        <option>Đầy hơi</option>
+                        <option>Ợ chua</option>
+                        <option>Khó tiêu</option>
+                        <option>Buồn nôn</option>
+                        <option>Chướng bụng</option>
+                        <option>Mệt mỏi</option>
+                        <option>Chán ăn</option>
+                        <option>Đau đầu</option>
+                        <option>Chóng mặt</option>
+                        <option>Mất ngủ</option>
+                        <option>Đau dạ dày nhẹ</option>
+                        <option>Viêm họng</option>
+                        <option>Ho khan</option>
+                        <option>Ngạt mũi</option>
+                        <option>Khó thở nhẹ</option>
+                        <option>Huyết áp thấp</option>
+                        <option>Da xanh xao</option>
+                        <option>Hạ đường huyết</option>
+
                     </select>
                     <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
-                  </div>
+                  </div>    
                 </div>
-                <div>
+                <div className='col-span-3'>
                   <label className="block text-sm font-medium mb-1">Mô tả tình trạng</label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
@@ -361,17 +391,20 @@ const MedicalRecord = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-4 gap-4">
+                <div className='col-span-1'>
                   <label className="block text-sm font-medium mb-1">Kết quả khám</label>
                   <div className="relative">
                     <select className="w-full border border-gray-300 rounded px-3 py-2 appearance-none bg-blue-100">
-                      <option>Đỡ</option>
+                        <option>Đỡ</option>
+                        <option>Không đỡ</option>
+                        <option>Không rõ</option>
+                        <option>Tệ hơn</option>
                     </select>
                     <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
                   </div>
                 </div>
-                <div>
+                <div className='col-span-3'>
                   <label className="block text-sm font-medium mb-1">Ghi chú</label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
@@ -439,11 +472,11 @@ const MedicalRecord = () => {
               <h2 className={`font-semibold ${underline}`}>XỬ TRÍ</h2>
             </div>
             <div className="p-4 space-y-2">
-              <button className="text-blue-600 hover:text-blue-800 underline text-sm" onClick={handlePrescriptionClick}>
+              <button className="text-blue-600 hover:text-blue-800 text-sm font-semibold" onClick={handlePrescriptionClick}>
                 Kê đơn thuốc
               </button>
               <br />
-              <button className="text-blue-600 hover:text-blue-800 underline text-sm" onClick={handleAppointmentClick}>
+              <button className="text-blue-600 hover:text-blue-800 text-sm font-semibold" onClick={handleAppointmentClick}>
                 Hẹn tái khám
               </button>
             </div>
@@ -503,13 +536,13 @@ const MedicalRecord = () => {
               <Edit className="h-4 w-4" />
             </button>
           </div>
-          <div className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Ngày tái khám</span>
+          <div className="p-15">
+            <div className="flex items-center justify-around h-30 bg-blue-100 rounded-[50px] p-5">
+              <span className="text-2xl font-medium">Ngày tái khám</span>
               {appointmentData ? (
                 <div className="text-right">
-                  <div className="text-sm font-medium">{appointmentData.date}</div>
-                  <div className="text-xs text-gray-500">{appointmentData.time}</div>
+                  <div className="text-xl font-medium">{appointmentData.date}</div>
+                  <div className="text-sm text-gray-500">{appointmentData.time}</div>
                 </div>
               ) : (
                 <button

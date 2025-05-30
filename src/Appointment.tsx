@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
@@ -31,6 +31,21 @@ const Appointment = () => {
     "Tháng 11",
     "Tháng 12",
   ]
+
+  useEffect(() => {
+    // Load appointment data from localStorage if available
+    const storedData = localStorage.getItem("appointmentData")
+    if (storedData) {
+      const appointmentData = JSON.parse(storedData)
+      setSelectedDate(appointmentData.date || "06/05/2025")
+      setSelectedTime(appointmentData.time || "10:00 AM")
+      setSelectedDay(parseInt(appointmentData.date.split("/")[0], 10))
+      setSelectedHour(appointmentData.time.split(":")[0])
+      setSelectedMinute(appointmentData.time.split(":")[1].split(" ")[0])
+      setSelectedPeriod(appointmentData.time.split(" ")[1])
+    }
+  },[])
+
 
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay()
