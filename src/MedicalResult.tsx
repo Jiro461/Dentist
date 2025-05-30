@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom"
 
 const MedicalRecord = () => {
   // Add navigation
+  const underline = "relative text-xl after:content-[''] after:absolute after:left-[-15px] after:bottom-[-4px] after:h-[2px] after:w-[calc(100%+30px)] after:bg-gray-200";
+
   const navigate = useNavigate()
 
   // State for form fields
@@ -201,7 +203,7 @@ const reloadData = () => {
           {/* THÔNG TIN HÀNH CHÍNH */}
           <section className="bg-white rounded-lg shadow-sm">
             <div className="bg-white text-black px-4 py-2 rounded-t-lg">
-              <h2 className="font-semibold">THÔNG TIN HÀNH CHÍNH</h2>
+              <h2 className={`font-semibold ${underline}`}>THÔNG TIN HÀNH CHÍNH</h2>
             </div>
             <div className="p-4">
               <div className="grid grid-cols-3 gap-4">
@@ -260,7 +262,7 @@ const reloadData = () => {
           {/* THÔNG TIN KHÁM BỆNH */}
           <section className="bg-white rounded-lg shadow-sm">
             <div className="bg-white text-black px-4 py-2 rounded-t-lg">
-              <h2 className="font-semibold">THÔNG TIN KHÁM BỆNH</h2>
+              <h2 className={`font-semibold ${underline}`}>THÔNG TIN KHÁM BỆNH</h2>
             </div>
             <div className="p-4 space-y-4">
               <div className="grid grid-cols-3 gap-4">
@@ -385,47 +387,46 @@ const reloadData = () => {
           {/* SINH HIỆU */}
           <section className="bg-white rounded-lg shadow-sm">
             <div className="bg-white text-black px-4 py-2 rounded-t-lg">
-              <h2 className="font-semibold">SINH HIỆU</h2>
+              <h2 className={`font-semibold ${underline}`}>SINH HIỆU</h2>
             </div>
-            <div className="p-4 space-y-3">
-              <div className="flex items-center justify-between">
+            <div className="p-4 grid grid-cols-1 gap-4 grid-rows-4">
+              <div className="w-full flex items-center justify-between">
                 <span className="text-sm font-medium">Cân nặng</span>
-                <div className="flex items-center gap-2">
+                <div className="w-[60%] flex items-center gap-2 justify-end">
                   <input
-                    className="w-16 border border-gray-300 rounded px-2 py-1 text-center bg-blue-100"
+                    className="flex-1 w-16 border border-gray-300 rounded px-2 py-1 bg-blue-100"
                     defaultValue="50"
                   />
-                  <span className="text-sm text-gray-600">kg</span>
+                  <span className="text-sm text-gray-600 w-[25%]">kg</span>
                 </div>
-              </div>
-              <div className="flex items-center justify-between">
+              </div><div className="w-full flex items-center justify-between">
                 <span className="text-sm font-medium">Chiều cao</span>
-                <div className="flex items-center gap-2">
+                <div className="w-[60%] flex items-center gap-2 justify-end">
                   <input
-                    className="w-16 border border-gray-300 rounded px-2 py-1 text-center bg-blue-100"
+                    className="flex-1 w-16 border border-gray-300 rounded px-2 py-1 bg-blue-100"
                     defaultValue="150"
                   />
-                  <span className="text-sm text-gray-600">cm</span>
+                  <span className="text-sm text-gray-600 w-[25%]">cm</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="w-full flex items-center justify-between">
                 <span className="text-sm font-medium">Huyết áp</span>
-                <div className="flex items-center gap-2">
+                <div className="w-[60%] flex items-center gap-2 justify-end">
                   <input
-                    className="w-20 border border-gray-300 rounded px-2 py-1 text-center bg-blue-100"
+                    className="flex-1 w-16 border border-gray-300 rounded px-2 py-1 bg-blue-100"
                     defaultValue="70/130"
                   />
-                  <span className="text-sm text-gray-600">mmHg</span>
+                  <span className="text-sm text-gray-600 w-[25%]">mmHg</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="w-full flex items-center justify-between">
                 <span className="text-sm font-medium">Nhịp tim</span>
-                <div className="flex items-center gap-2">
+                <div className="w-[60%] flex items-center gap-2 justify-end">
                   <input
-                    className="w-16 border border-gray-300 rounded px-2 py-1 text-center bg-blue-100"
+                    className="flex-1 w-16 border border-gray-300 rounded px-2 py-1 bg-blue-100"
                     defaultValue="75"
                   />
-                  <span className="text-sm text-gray-600">lần/phút</span>
+                  <span className="text-sm text-gray-600 w-[25%]">lần/phút</span>
                 </div>
               </div>
             </div>
@@ -434,7 +435,7 @@ const reloadData = () => {
           {/* XỬ TRÍ */}
           <section className="bg-white rounded-lg shadow-sm">
             <div className="bg-white text-black px-4 py-2 rounded-t-lg">
-              <h2 className="font-semibold">XỬ TRÍ</h2>
+              <h2 className={`font-semibold ${underline}`}>XỬ TRÍ</h2>
             </div>
             <div className="p-4 space-y-2">
               <button className="text-blue-600 hover:text-blue-800 underline text-sm" onClick={handlePrescriptionClick}>
@@ -453,8 +454,8 @@ const reloadData = () => {
       <div className="grid grid-cols-2 gap-6 mt-6">
         {/* KÊ ĐƠN THUỐC */}
         <section className="bg-white rounded-lg shadow-sm">
-          <div className="bg-white text-black px-4 py-2 rounded-t-lg flex items-center justify-between">
-            <h2 className="font-semibold">KÊ ĐƠN THUỐC</h2>
+          <div className="relative text-xl after:content-[''] after:absolute after:left-[3px] after:bottom-[-4px] after:h-[2px] after:w-[calc(99%)] after:bg-gray-200 bg-white text-black px-4 py-2 rounded-t-lg flex items-center justify-between">
+            <h2 className="font-semibold ">KÊ ĐƠN THUỐC</h2>
             <button className="cursor-pointer" onClick={handlePrescriptionClick}>
               <Edit className="h-4 w-4" />
             </button>
@@ -462,12 +463,12 @@ const reloadData = () => {
           <div className="p-4">
             <table className="w-full">
               <thead>
-                <tr className="bg-blue-500">
-                  <th className="px-3 border-gray-300 py-2 text-left text-sm font-medium">STT</th>
-                  <th className="px-3 border-gray-300 py-2 text-left text-sm font-medium">Thuốc</th>
-                  <th className="px-3 border-gray-300 py-2 text-left text-sm font-medium">Đơn vị tính</th>
-                  <th className="px-3 border-gray-300 py-2 text-left text-sm font-medium">Số lượng</th>
-                  <th className="px-3 border-gray-300 py-2 text-left text-sm font-medium">Số ngày</th>
+                <tr className="bg-blue-500 border-gray-300">    
+                  <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium rounded-l-sm">STT</th>
+                  <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium">Thuốc</th>
+                  <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium">Đơn vị tính</th>
+                  <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium">Số lượng</th>
+                  <th className="px-3  py-2 text-left text-sm font-medium rounded-r-sm">Số ngày</th>
                 </tr>
               </thead>
               <tbody>
@@ -495,7 +496,7 @@ const reloadData = () => {
 
         {/* HẸN TÁI KHÁM */}
         <section className="bg-white rounded-lg shadow-sm">
-          <div className="bg-white text-black px-4 py-2 rounded-t-lg flex items-center justify-between">
+          <div className="relative text-xl after:content-[''] after:absolute after:left-[3px] after:bottom-[-4px] after:h-[2px] after:w-[calc(99%)] after:bg-gray-200 bg-white text-black px-4 py-2 rounded-t-lg flex items-center justify-between">
             <h2 className="font-semibold">HẸN TÁI KHÁM</h2>
             <button className="cursor-pointer" onClick={handleAppointmentClick}>
               <Edit className="h-4 w-4" />
