@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import {  useRef, useState } from "react"
 import { Search, Filter, Eye} from "lucide-react"
 import { Input } from "./components/ui/input"
 import { Button } from "./components/ui/button"
@@ -70,19 +70,7 @@ export default function PatientList() {
     patientCode: "all",
     examDate: "all",
   })
-  useEffect(()=>{
-    const handleClickoutside = (event: MouseEvent) => {
-      if(filterRef.current && !filterRef.current.contains(event.target as Node)){
-        setShowAdvancedFilter(false)
-      }
-    }
-    if(showAdvancedFilter){
-      document.addEventListener("mousedown", handleClickoutside)
-    }
-    return ()=>{
-      document.removeEventListener("mousedown", handleClickoutside)
-    }
-  },[showAdvancedFilter])
+ 
 
   const handleBasicSearch = (term: string) => {
     setSearchTerm(term)
@@ -112,6 +100,16 @@ export default function PatientList() {
     if (filters.patientCode && filters.patientCode !== "all") {
       filtered = filtered.filter((patient) => patient.patientCode === filters.patientCode)
     }
+    if (filters.examDate && filters.examDate !== "all") {
+    const [fYear, fMonth, fDay] = filters.examDate.split("-")
+    const selectedDate = new Date(+fYear, +fMonth - 1, +fDay)
+
+    filtered = filtered.filter((patient) => {
+    const [day, month, year] = patient.examDate.split("/")
+    const examDate = new Date(+year, +month - 1, +day)
+    return examDate.getTime() === selectedDate.getTime()
+    })
+ }
 
     setPatients(filtered)
     setShowAdvancedFilter(false)
@@ -171,7 +169,9 @@ export default function PatientList() {
     <div className="p-6">
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-medium text-gray-800">Danh sách bệnh nhân chờ khám</h2>
+          <h2 className="text-lg font-medium text-gray-800">
+            Danh sách bệnh nhân chờ khám
+          </h2>
           <div className="flex items-center gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -182,35 +182,50 @@ export default function PatientList() {
                 className="pl-10 w-80"
               />
             </div>
-            <Button variant="outline" onClick={() => setShowAdvancedFilter(!showAdvancedFilter)} className="p-2 ">
+            <Button
+              variant="outline"
+              onClick={() => setShowAdvancedFilter(!showAdvancedFilter)}
+              className="p-2 "
+            >
               <Filter className="w-4 h-4 " />
             </Button>
           </div>
         </div>
 
         {showAdvancedFilter && (
-          <div className="absolute  right-10 z-20 w-[60%] mb-6 p-4 bg-white border rounded-lg " ref={filterRef}>
+        <>
+          {/* Overlay mờ nền */}
+           <div className="fixed inset-0 bg-grey backdrop-blur-sm z-10" 
+           onClick={() => setShowAdvancedFilter(false)} />
+          <div
+            className="absolute  right-10 z-20 w-[60%] mb-6 p-4 bg-white border rounded-lg "
+            ref={filterRef}
+          >
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-4">
                   <CustomSelect
                     label="Tên"
                     value={filters.name}
-                    onValueChange={(value) => setFilters({ ...filters, name: value })}
+                    onValueChange={(value) =>
+                      setFilters({ ...filters, name: value })
+                    }
                     options={[
                       { value: "all", label: "Tất cả" },
                       { value: "Nguyễn Văn An", label: "Nguyễn Văn An" },
                       { value: "Trần Thị Bình", label: "Trần Thị Bình" },
                       { value: "Lê Minh Châu", label: "Lê Minh Châu" },
                       { value: "Phạm Quốc Dũng", label: "Phạm Quốc Dũng" },
-                      { value: "Phạm Thị E", label: "Phạm Thị E" },
+                      { value: "Hoàng Thị E", label: "Hoàng Thị E" },
                     ]}
                   />
 
                   <CustomSelect
                     label="Chuyên khoa"
                     value={filters.department}
-                    onValueChange={(value) => setFilters({ ...filters, department: value })}
+                    onValueChange={(value) =>
+                      setFilters({ ...filters, department: value })
+                    }
                     options={[
                       { value: "all", label: "Tất cả" },
                       { value: "Tai mũi họng", label: "Tai mũi họng" },
@@ -226,7 +241,9 @@ export default function PatientList() {
                       <CustomSelect
                         label="Mã bệnh nhân"
                         value={filters.patientCode}
-                        onValueChange={(value) => setFilters({ ...filters, patientCode: value })}
+                        onValueChange={(value) =>
+                          setFilters({ ...filters, patientCode: value })
+                        }
                         options={[
                           { value: "all", label: "Tất cả" },
                           { value: "BN001", label: "BN001" },
@@ -237,23 +254,32 @@ export default function PatientList() {
                         ]}
                       />
                     </div>
-                    <Button onClick={clearFilters} variant="outline" className="px-6 h-10">
+                    <Button
+                      onClick={clearFilters}
+                      variant="outline"
+                      className="px-6 h-10"
+                    >
                       Xóa
                     </Button>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <div className="flex-1">
-                      <CustomSelect
-                        label="Ngày khám"
-                        value={filters.examDate}
-                        onValueChange={(value) => setFilters({ ...filters, examDate: value })}
-                        options={[
-                          { value: "all", label: "Tất cả" },
-                          { value: "available", label: "Còn trống" },
-                        ]}
+                    <div className="flex items-center border rounded-lg bg-white">
+                      <div className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 border-r min-w-[120px]">
+                        Ngày khám
+                      </div>
+                      <Input
+                        type="date"
+                        className="flex-1 border-0 shadow-none focus:ring-0"
+                        value={
+                          filters.examDate === "all" ? "" : filters.examDate
+                        }
+                        onChange={(e) =>
+                          setFilters({ ...filters, examDate: e.target.value })
+                        }
                       />
                     </div>
+
                     <Button
                       onClick={handleAdvancedFilter}
                       className="bg-blue-700 hover:bg-blue-600 text-white px-6 h-10"
@@ -264,18 +290,28 @@ export default function PatientList() {
                 </div>
               </div>
             </div>
-          </div>
+          </div></>
         )}
 
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b">
-                <th className="text-left py-3 px-4 font-medium text-gray-600">STT</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600">Mã bệnh nhân</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600">Tên bệnh nhân</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600">Chuyên khoa</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600">Ngày khám</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-600">
+                  STT
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-600">
+                  Mã bệnh nhân
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-600">
+                  Tên bệnh nhân
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-600">
+                  Chuyên khoa
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-600">
+                  Ngày khám
+                </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-600"></th>
               </tr>
             </thead>
@@ -288,7 +324,11 @@ export default function PatientList() {
                   <td className="py-3 px-4">{patient.department}</td>
                   <td className="py-3 px-4">{patient.examDate}</td>
                   <td className="py-3 px-4">
-                    <Button variant="ghost" size="sm" onClick={() => handleViewPatient(patient)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleViewPatient(patient)}
+                    >
                       <Eye className="w-4 h-4" />
                     </Button>
                   </td>
@@ -308,7 +348,9 @@ export default function PatientList() {
               {">"}
             </Button>
           </div>
-          <div className="text-sm text-gray-600">Tổng hồ sơ: {patients.length}</div>
+          <div className="text-sm text-gray-600">
+            Tổng hồ sơ: {patients.length}
+          </div>
         </div>
       </div>
 
@@ -317,7 +359,9 @@ export default function PatientList() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <div className="flex justify-between items-center">
-              <DialogTitle className="text-lg font-bold">THÔNG TIN ĐĂNG KÝ KHÁM BỆNH</DialogTitle>
+              <DialogTitle className="text-lg font-bold">
+                THÔNG TIN ĐĂNG KÝ KHÁM BỆNH
+              </DialogTitle>
             </div>
           </DialogHeader>
 
@@ -331,27 +375,38 @@ export default function PatientList() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="font-medium">Chuyên khoa</span>
-                  <span className="bg-gray-100 px-3 py-1 rounded">{selectedPatient.department}</span>
+                  <span className="bg-gray-100 px-3 py-1 rounded">
+                    {selectedPatient.department}
+                  </span>
                 </div>
 
                 <div className="flex justify-between">
                   <span className="font-medium">Ngày khám</span>
-                  <span className="bg-gray-100 px-3 py-1 rounded">{selectedPatient.examDate}</span>
+                  <span className="bg-gray-100 px-3 py-1 rounded">
+                    {selectedPatient.examDate}
+                  </span>
                 </div>
 
                 <div className="flex justify-between">
                   <span className="font-medium">Số thứ tự</span>
-                  <span className="bg-gray-100 px-3 py-1 rounded">{selectedPatient.orderNumber}</span>
+                  <span className="bg-gray-100 px-3 py-1 rounded">
+                    {selectedPatient.orderNumber}
+                  </span>
                 </div>
 
                 <div className="flex justify-between">
                   <span className="font-medium">Hình thức khám</span>
-                  <span className="bg-gray-100 px-3 py-1 rounded">{selectedPatient.examType}</span>
+                  <span className="bg-gray-100 px-3 py-1 rounded">
+                    {selectedPatient.examType}
+                  </span>
                 </div>
               </div>
 
               <div className="pt-4">
-                <Button onClick={handleCreateMedicalRecord} className="w-full bg-blue-500 hover:bg-blue-600">
+                <Button
+                  onClick={handleCreateMedicalRecord}
+                  className="w-full bg-blue-500 hover:bg-blue-600"
+                >
                   Tạo bệnh án
                 </Button>
               </div>
@@ -360,5 +415,5 @@ export default function PatientList() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
