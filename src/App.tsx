@@ -5,7 +5,7 @@ import MedicalRecord from './MedicalResult';
 import Prescription from './Prescription';
 import Appointment from './Appointment';
 import Header from './components/Header'; // Import Header
-import Sidebar from './components/sidebar';
+import Sidebar from './components/Sidebar';
 
 function App() {
   return (
