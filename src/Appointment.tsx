@@ -53,7 +53,7 @@ const Appointment = () => {
   const handleSave = () => {
     // Save appointment data to localStorage
     const appointmentData = {
-      doctor: "Nguyễn Thanh Hoài",
+      doctor: "Trần Văn Kiên",
       date: selectedDate,
       time: selectedTime,
       patientId: "BN001",
@@ -66,7 +66,7 @@ const Appointment = () => {
   const handleBack = () => {
     // Save current state before going back
     const appointmentData = {
-      doctor: "Nguyễn Thanh Hoài",
+      doctor: "Trần Văn Kiên",
       date: selectedDate,
       time: selectedTime,
       patientId: "BN001",
@@ -271,7 +271,7 @@ const Appointment = () => {
               <div>
                 <h3 className="text-lg font-medium text-gray-700 mb-4">Bác sĩ</h3>
                 <div className="bg-white border border-gray-200 rounded-full px-6 py-3 shadow-sm">
-                  <span className="text-lg text-gray-800">Nguyễn Thanh Hoài</span>
+                  <span className="text-lg text-gray-800">Trần Văn Kiên</span>
                 </div>
               </div>
 
