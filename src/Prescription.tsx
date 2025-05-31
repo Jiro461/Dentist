@@ -80,7 +80,7 @@ const Prescription = () => {
       totalCost,
       prescriptionId: "DT001",
       date: "20/05/2025",
-      doctor: "Nguyễn Thanh Hoài",
+      doctor: "Trần Văn Kiên",
     }
     localStorage.setItem("prescriptionData", JSON.stringify(prescriptionData))
     setShowSuccessModal(true)
@@ -132,7 +132,7 @@ const Prescription = () => {
       totalCost,
       prescriptionId: "DT001",
       date: "20/05/2025",
-      doctor: "Nguyễn Thanh Hoài",
+      doctor: "Trần Văn Kiên",
     }
     localStorage.setItem("prescriptionData", JSON.stringify(prescriptionData))
     navigate("/medical-record")
@@ -203,7 +203,7 @@ const Prescription = () => {
           <label className="block text-sm font-medium mb-1">Bác sĩ kê đơn</label>
           <input
             className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-50"
-            defaultValue="Nguyễn Thanh Hoài"
+            defaultValue="Trần Văn Kiên"
           />
         </div>
         <div>

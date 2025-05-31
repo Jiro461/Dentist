@@ -1,153 +1,137 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useRef, useEffect } from "react"
-import { ChevronDown, Edit, Calendar, AlertTriangle } from "lucide-react"
-import { useNavigate } from "react-router-dom"
-
-const MedicalRecord = () => {
+import type React from "react";
+import { useState, useRef, useEffect, type JSX } from "react";
+import { ChevronDown, Edit, Calendar, AlertTriangle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import DiseaseSelect from "./handleinput";
+import SymptomSelect from "./handleinput2";
+const MedicalRecord = (): JSX.Element => {
   // Add navigation
-  const underline = "relative text-xl after:content-[''] after:absolute after:left-[-15px] after:bottom-[-4px] after:h-[2px] after:w-[calc(100%+30px)] after:bg-gray-200";
+  const underline =
+    "relative text-xl after:content-[''] after:absolute after:left-[-15px] after:bottom-[-4px] after:h-[2px] after:w-[calc(100%+30px)] after:bg-gray-200";
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // State for form fields
   const [formData, setFormData] = useState({
-    huongDieuTri: "Sử dụng phác đồ kháng sinh kết hợp với thuốc ức chế tiết acid (PPI) trong 10-14 ngày.",
-  })
+    huongDieuTri: "",
+  });
+  const [prescriptionData, setPrescriptionData] = useState<any>(null);
+  const [appointmentData, setAppointmentData] = useState<any>(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const huongDieuTriRef = useRef<HTMLTextAreaElement>(null);
 
-  // State for prescription data
-  const [prescriptionData, setPrescriptionData] = useState<any>(null)
-
-  // State for appointment data
-  const [appointmentData, setAppointmentData] = useState<any>(null)
-
-  // State for alert
-  const [showAlert, setShowAlert] = useState(false)
-
-  // State for success modal
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
-
-  // Ref for scrolling to treatment direction field
-  const huongDieuTriRef = useRef<HTMLTextAreaElement>(null)
-// Add this function after the state declarations
-// const reloadData = () => {
-//     const savedPrescription = localStorage.getItem("prescriptionData")
-//     if (savedPrescription) {
-//       setPrescriptionData(JSON.parse(savedPrescription))
-//     }
-
-//     const savedAppointment = localStorage.getItem("appointmentData")
-//     if (savedAppointment) {
-//       setAppointmentData(JSON.parse(savedAppointment))
-//     }
-//   }
-  // Load prescription and appointment data from localStorage on component mount
   useEffect(() => {
     const loadData = () => {
-      const savedPrescription = localStorage.getItem("prescriptionData")
+      const savedPrescription = localStorage.getItem("prescriptionData");
       if (savedPrescription) {
-        setPrescriptionData(JSON.parse(savedPrescription))
+        setPrescriptionData(JSON.parse(savedPrescription));
       }
 
-      const savedAppointment = localStorage.getItem("appointmentData")
+      const savedAppointment = localStorage.getItem("appointmentData");
       if (savedAppointment) {
-        setAppointmentData(JSON.parse(savedAppointment))
+        setAppointmentData(JSON.parse(savedAppointment));
       }
-    }
+    };
 
     // Load data initially
-    loadData()
+    loadData();
 
     // Add event listener for when window gains focus (user comes back to tab)
     const handleFocus = () => {
-      loadData()
-    }
+      loadData();
+    };
 
-    window.addEventListener("focus", handleFocus)
+    window.addEventListener("focus", handleFocus);
 
     // Also listen for storage events (when localStorage changes in other tabs)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "prescriptionData" || e.key === "appointmentData") {
-        loadData()
+        loadData();
       }
-    }
+    };
 
-    window.addEventListener("storage", handleStorageChange)
+    window.addEventListener("storage", handleStorageChange);
 
     // Cleanup
     return () => {
-      window.removeEventListener("focus", handleFocus)
-      window.removeEventListener("storage", handleStorageChange)
-    }
-  }, [])
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   // Handle form field changes
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLTextAreaElement | HTMLInputElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   // Handle prescription button click
   const handlePrescriptionClick = () => {
     // Validate required fields before proceeding
     if (!formData.huongDieuTri?.trim()) {
-      setShowAlert(true)
+      setShowAlert(true);
       // Scroll to the treatment direction field
       setTimeout(() => {
-        huongDieuTriRef.current?.focus()
-      }, 100)
-      return
+        huongDieuTriRef.current?.focus();
+      }, 100);
+      return;
     }
 
     // If validation passes, navigate to prescription page
-    navigate("/prescription")
-  }
+    navigate("/prescription");
+  };
 
   // Handle appointment button click
   const handleAppointmentClick = () => {
     // Validate required fields before proceeding
     if (!formData.huongDieuTri?.trim()) {
-      setShowAlert(true)
+      setShowAlert(true);
       // Scroll to the treatment direction field
       setTimeout(() => {
-        huongDieuTriRef.current?.focus()
-      }, 100)
-      return
+        huongDieuTriRef.current?.focus();
+      }, 100);
+      return;
     }
 
     // If validation passes, navigate to appointment page
-    navigate("/appointment")
-  }
+    navigate("/appointment");
+  };
 
   // Close alert
   const closeAlert = () => {
-    setShowAlert(false)
-  }
+    setShowAlert(false);
+  };
 
   // Handle save button click
   const handleSave = () => {
     // Validate required fields before saving
     if (!formData.huongDieuTri?.trim()) {
-      setShowAlert(true)
+      setShowAlert(true);
       setTimeout(() => {
-        huongDieuTriRef.current?.focus()
-      }, 100)
-      return
+        huongDieuTriRef.current?.focus();
+      }, 100);
+      return;
     }
 
     // If validation passes, show success modal
-    setShowSuccessModal(true)
-  }
+    setShowSuccessModal(true);
+  };
 
   // Close success modal
   const closeSuccessModal = () => {
-    setShowSuccessModal(false)
-  }
+    setShowSuccessModal(false);
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen relative">
@@ -157,7 +141,9 @@ const MedicalRecord = () => {
           <div className="fixed inset-0 bg-black/20" onClick={closeAlert}></div>
           <div className="bg-red-200 rounded-lg shadow-lg p-4 z-10 flex items-center gap-3 max-w-md">
             <AlertTriangle className="text-yellow-500 h-8 w-8" />
-            <div className="text-blue-600 font-medium text-lg">Bạn phải nhập đầy đủ thông tin!</div>
+            <div className="text-blue-600 font-medium text-lg">
+              Bạn phải nhập đầy đủ thông tin!
+            </div>
           </div>
         </div>
       )}
@@ -165,15 +151,30 @@ const MedicalRecord = () => {
       {/* Success modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="fixed inset-0 bg-black/50" onClick={closeSuccessModal}></div>
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={closeSuccessModal}
+          ></div>
           <div className="bg-white rounded-lg shadow-xl p-8 z-10 max-w-md mx-4">
             <div className="text-center">
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-8 h-8 text-green-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               </div>
-              <h3 className="text-xl font-medium text-blue-600 mb-6">Lưu bệnh án thành công!</h3>
+              <h3 className="text-xl font-medium text-blue-600 mb-6">
+                Lưu bệnh án thành công!
+              </h3>
               <button
                 onClick={closeSuccessModal}
                 className="bg-blue-1000 hover:bg-blue-600 text-white px-8 py-2 rounded font-medium"
@@ -187,13 +188,19 @@ const MedicalRecord = () => {
 
       {/* Print controls */}
       <div className="flex justify-end mb-4 gap-2">
-        <button className="flex items-center gap-1 text-gray-600 hover:text-gray-800" onClick={handleSave}>
+        <button
+          className="flex items-center gap-1 text-gray-600 hover:text-gray-800"
+          onClick={handleSave}
+        >
           <span>📄</span> Lưu
         </button>
         <button className="flex items-center gap-1 text-gray-600 hover:text-gray-800">
           <span>🖨️</span> In
         </button>
-        <button onClick={() => navigate('/')} className="flex items-center gap-1 text-gray-600 hover:text-gray-800">
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center gap-1 text-gray-600 hover:text-gray-800"
+        >
           <span>✕</span> Đóng
         </button>
       </div>
@@ -204,12 +211,16 @@ const MedicalRecord = () => {
           {/* THÔNG TIN HÀNH CHÍNH */}
           <section className="bg-white rounded-lg shadow-sm">
             <div className="bg-white text-black px-4 py-2 rounded-t-lg">
-              <h2 className={`font-semibold ${underline}`}>THÔNG TIN HÀNH CHÍNH</h2>
+              <h2 className={`font-semibold ${underline}`}>
+                THÔNG TIN HÀNH CHÍNH
+              </h2>
             </div>
             <div className="p-4">
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Mã bệnh nhân</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Mã bệnh nhân
+                  </label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                     defaultValue="BN001"
@@ -217,18 +228,27 @@ const MedicalRecord = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Họ tên</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Họ tên
+                  </label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                     defaultValue="Nguyễn Văn An"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Giới tính</label>
-                  <input className="w-full border border-gray-300 rounded px-3 py-2 bg-white" defaultValue="Nam" />
+                  <label className="block text-sm font-medium mb-1">
+                    Giới tính
+                  </label>
+                  <input
+                    className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
+                    defaultValue="Nam"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Mã số khám</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Mã số khám
+                  </label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                     defaultValue="SK001"
@@ -236,21 +256,27 @@ const MedicalRecord = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Số điện thoại</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Số điện thoại
+                  </label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                     defaultValue="0912345678"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Ngày sinh</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Ngày sinh
+                  </label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                     defaultValue="27/07/1999"
                   />
                 </div>
                 <div className="col-span-3">
-                  <label className="block text-sm font-medium mb-1">Địa chỉ</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Địa chỉ
+                  </label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                     defaultValue="123 Đường Láng, Hà Nội"
@@ -263,12 +289,16 @@ const MedicalRecord = () => {
           {/* THÔNG TIN KHÁM BỆNH */}
           <section className="bg-white rounded-lg shadow-sm">
             <div className="bg-white text-black px-4 py-2 rounded-t-lg">
-              <h2 className={`font-semibold ${underline}`}>THÔNG TIN KHÁM BỆNH</h2>
+              <h2 className={`font-semibold ${underline}`}>
+                THÔNG TIN KHÁM BỆNH
+              </h2>
             </div>
             <div className="p-4 space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Chuyên khoa</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Chuyên khoa
+                  </label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                     defaultValue="Nội tiêu hóa"
@@ -276,7 +306,9 @@ const MedicalRecord = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Ngày khám</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Ngày khám
+                  </label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-white"
                     defaultValue="20/05/2025"
@@ -284,96 +316,76 @@ const MedicalRecord = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Lý do đến khám</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Lý do đến khám
+                  </label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
-                    defaultValue="--Không bắt buộc--"
+                    defaultValue=""
+                  />
+                </div>
+                <div className="col-span-3">
+                  <label className="block text-sm font-medium mb-1">
+                    Tiền sử bệnh
+                  </label>
+                  <input
+                    className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
+                    defaultValue=""
+                    required
+                  />
+                </div>
+                <div className="col-span-3">
+                  <label className="block text-sm font-medium mb-1">
+                    Triệu chứng
+                  </label>
+                  <textarea
+                    className="w-full border border-gray-300 rounded px-3 py-2 h-20 bg-blue-100"
+                    defaultValue=""
+                    required
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Tiền sử bệnh</label>
-                <input
-                  className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
-                  defaultValue="Viêm dạ dày"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Triệu chứng</label>
-                <textarea
-                  className="w-full border border-gray-300 rounded px-3 py-2 h-20 bg-blue-100"
-                  defaultValue="Đau vùng thượng vị, ăn uống khó khăn, hay ói mửa"
-                />
-              </div>
-
               <div className="grid grid-cols-4 gap-4">
-                <div className='col-span-1'>
+                <div className="col-span-1 relative">
                   <label className="block text-sm font-medium mb-1">
                     Bệnh chính <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative">
-                    <select className="w-full border border-gray-300 rounded px-3 py-2 appearance-none bg-blue-100">
-                    <option>Loét dạ dày</option>
-                    <option>Viêm dạ dày</option>
-                    <option>Trào ngược dạ dày thực quản</option>
-                    <option>Hội chứng ruột kích thích</option>
-                    <option>Viêm đại tràng</option>
-                    <option>Táo bón</option>
-                    <option>Tiêu chảy cấp</option>
-                    <option>Viêm gan B</option>
-                    <option>Viêm gan C</option>
-                    <option>Sỏi mật</option>
-                    <option>Suy gan</option>
-                    <option>Suy thận mạn</option>
-                    <option>Tiểu đường type 2</option>
-                    </select>
-                    <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
+                  <div>
+                    <DiseaseSelect />
                   </div>
+                  <ChevronDown className="absolute right-3 top-10 h-4 w-4 text-gray-400" />
                 </div>
-                <div className='col-span-3'>
-                  <label className="block text-sm font-medium mb-1">Mô tả tình trạng</label>
+                <div className="col-span-3">
+                  <label className="block text-sm font-medium mb-1">
+                    Mô tả tình trạng
+                  </label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
-                    defaultValue="Loét dạ dày tá tràng nghi do NSAIDs."
+                    defaultValue=""
+                    required
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-4 gap-4">
-                <div className='col-span-1'>
-                  <label className="block text-sm font-medium mb-1">Bệnh phụ</label>
-                  <div className="relative">
-                    <select className="w-full border border-gray-300 rounded px-3 py-2 appearance-none bg-blue-100">
-                        <option>Đầy hơi</option>
-                        <option>Ợ chua</option>
-                        <option>Khó tiêu</option>
-                        <option>Buồn nôn</option>
-                        <option>Chướng bụng</option>
-                        <option>Mệt mỏi</option>
-                        <option>Chán ăn</option>
-                        <option>Đau đầu</option>
-                        <option>Chóng mặt</option>
-                        <option>Mất ngủ</option>
-                        <option>Đau dạ dày nhẹ</option>
-                        <option>Viêm họng</option>
-                        <option>Ho khan</option>
-                        <option>Ngạt mũi</option>
-                        <option>Khó thở nhẹ</option>
-                        <option>Huyết áp thấp</option>
-                        <option>Da xanh xao</option>
-                        <option>Hạ đường huyết</option>
-
-                    </select>
-                    <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
-                  </div>    
+                <div className="col-span-1 relative">
+                  <label className="block text-sm font-medium mb-1">
+                    Bệnh phụ
+                  </label>
+                  <div>
+                    <SymptomSelect />
+                  </div>
+                  <ChevronDown className="absolute right-3 top-10 h-4 w-4 text-gray-400" />
                 </div>
-                <div className='col-span-3'>
-                  <label className="block text-sm font-medium mb-1">Mô tả tình trạng</label>
+                <div className="col-span-3">
+                  <label className="block text-sm font-medium mb-1">
+                    Mô tả tình trạng
+                  </label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
-                    placeholder="Không bắt buộc"
+                    placeholder=""
+                    required
                   />
                 </div>
               </div>
@@ -385,30 +397,38 @@ const MedicalRecord = () => {
                 <textarea
                   ref={huongDieuTriRef}
                   name="huongDieuTri"
-                  className={`w-full border ${!formData.huongDieuTri?.trim() && showAlert ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"} bg-blue-100 rounded px-3 py-2 h-20`}
+                  className={`w-full border ${
+                    !formData.huongDieuTri?.trim() && showAlert
+                      ? "border-red-500 ring-1 ring-red-500"
+                      : "border-gray-300"
+                  } bg-blue-100 rounded px-3 py-2 h-20`}
                   value={formData.huongDieuTri}
                   onChange={handleChange}
                 />
               </div>
 
               <div className="grid grid-cols-4 gap-4">
-                <div className='col-span-1'>
-                  <label className="block text-sm font-medium mb-1">Kết quả khám</label>
+                <div className="col-span-1">
+                  <label className="block text-sm font-medium mb-1">
+                    Kết quả khám
+                  </label>
                   <div className="relative">
                     <select className="w-full border border-gray-300 rounded px-3 py-2 appearance-none bg-blue-100">
-                        <option>Đỡ</option>
-                        <option>Không đỡ</option>
-                        <option>Không rõ</option>
-                        <option>Tệ hơn</option>
+                      <option>Đỡ</option>
+                      <option>Không đỡ</option>
+                      <option>Không rõ</option>
+                      <option>Tệ hơn</option>
                     </select>
                     <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
                   </div>
                 </div>
-                <div className='col-span-3'>
-                  <label className="block text-sm font-medium mb-1">Ghi chú</label>
+                <div className="col-span-3">
+                  <label className="block text-sm font-medium mb-1">
+                    Ghi chú
+                  </label>
                   <input
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
-                    defaultValue="Không có"
+                    defaultValue=""
                   />
                 </div>
               </div>
@@ -429,16 +449,17 @@ const MedicalRecord = () => {
                 <div className="w-[60%] flex items-center gap-2 justify-end">
                   <input
                     className="flex-1 w-16 border border-gray-300 rounded px-2 py-1 bg-blue-100"
-                    defaultValue="50"
+                    defaultValue=""
                   />
                   <span className="text-sm text-gray-600 w-[25%]">kg</span>
                 </div>
-              </div><div className="w-full flex items-center justify-between">
+              </div>
+              <div className="w-full flex items-center justify-between">
                 <span className="text-sm font-medium">Chiều cao</span>
                 <div className="w-[60%] flex items-center gap-2 justify-end">
                   <input
                     className="flex-1 w-16 border border-gray-300 rounded px-2 py-1 bg-blue-100"
-                    defaultValue="150"
+                    defaultValue=""
                   />
                   <span className="text-sm text-gray-600 w-[25%]">cm</span>
                 </div>
@@ -448,7 +469,7 @@ const MedicalRecord = () => {
                 <div className="w-[60%] flex items-center gap-2 justify-end">
                   <input
                     className="flex-1 w-16 border border-gray-300 rounded px-2 py-1 bg-blue-100"
-                    defaultValue="70/130"
+                    defaultValue=""
                   />
                   <span className="text-sm text-gray-600 w-[25%]">mmHg</span>
                 </div>
@@ -458,9 +479,11 @@ const MedicalRecord = () => {
                 <div className="w-[60%] flex items-center gap-2 justify-end">
                   <input
                     className="flex-1 w-16 border border-gray-300 rounded px-2 py-1 bg-blue-100"
-                    defaultValue="75"
+                    defaultValue=""
                   />
-                  <span className="text-sm text-gray-600 w-[25%]">lần/phút</span>
+                  <span className="text-sm text-gray-600 w-[25%]">
+                    lần/phút
+                  </span>
                 </div>
               </div>
             </div>
@@ -472,11 +495,17 @@ const MedicalRecord = () => {
               <h2 className={`font-semibold ${underline}`}>XỬ TRÍ</h2>
             </div>
             <div className="p-4 space-y-2">
-              <button className="text-blue-600 hover:text-blue-800 text-sm font-semibold" onClick={handlePrescriptionClick}>
+              <button
+                className="text-blue-600 hover:text-blue-800 text-sm font-semibold"
+                onClick={handlePrescriptionClick}
+              >
                 Kê đơn thuốc
               </button>
               <br />
-              <button className="text-blue-600 hover:text-blue-800 text-sm font-semibold" onClick={handleAppointmentClick}>
+              <button
+                className="text-blue-600 hover:text-blue-800 text-sm font-semibold"
+                onClick={handleAppointmentClick}
+              >
                 Hẹn tái khám
               </button>
             </div>
@@ -490,39 +519,46 @@ const MedicalRecord = () => {
         <section className="bg-white rounded-lg shadow-sm">
           <div className="relative text-xl after:content-[''] after:absolute after:left-[3px] after:bottom-[-4px] after:h-[2px] after:w-[calc(99%)] after:bg-gray-200 bg-white text-black px-4 py-2 rounded-t-lg flex items-center justify-between">
             <h2 className="font-semibold ">KÊ ĐƠN THUỐC</h2>
-            <button className="cursor-pointer" onClick={handlePrescriptionClick}>
+            <button
+              className="cursor-pointer"
+              onClick={handlePrescriptionClick}
+            >
               <Edit className="h-4 w-4" />
             </button>
           </div>
           <div className="p-4">
             <table className="w-full">
               <thead>
-                <tr className="bg-blue-500 border-gray-300">    
-                  <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium rounded-l-sm">STT</th>
-                  <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium">Thuốc</th>
-                  <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium">Đơn vị tính</th>
-                  <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium">Số lượng</th>
-                  <th className="px-3  py-2 text-left text-sm font-medium rounded-r-sm">Số ngày</th>
+                <tr className="bg-blue-500 border-gray-300">
+                  <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium rounded-l-sm">
+                    STT
+                  </th>
+                  <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium">
+                    Thuốc
+                  </th>
+                  <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium">
+                    Đơn vị tính
+                  </th>
+                  <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium">
+                    Số lượng
+                  </th>
+                  <th className="px-3  py-2 text-left text-sm font-medium rounded-r-sm">
+                    Số ngày
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {prescriptionData?.medications?.map((med: any, index: number) => (
-                  <tr key={med.id} className="border-b">
-                    <td className="px-3 py-2 text-sm">{index + 1}</td>
-                    <td className="px-3 py-2 text-sm">{med.name}</td>
-                    <td className="px-3 py-2 text-sm">{med.unit}</td>
-                    <td className="px-3 py-2 text-sm">{med.quantity}</td>
-                    <td className="px-3 py-2 text-sm">{med.days}</td>
-                  </tr>
-                )) || (
-                  <tr className="border-b">
-                    <td className="px-3 py-2 text-sm">1</td>
-                    <td className="px-3 py-2 text-sm">Omeprazole</td>
-                    <td className="px-3 py-2 text-sm">viên</td>
-                    <td className="px-3 py-2 text-sm">20</td>
-                    <td className="px-3 py-2 text-sm">10</td>
-                  </tr>
-                )}
+                {prescriptionData?.medications?.map(
+                  (med: any, index: number) => (
+                    <tr key={med.id} className="border-b">
+                      <td className="px-3 py-2 text-sm">{index + 1}</td>
+                      <td className="px-3 py-2 text-sm">{med.name}</td>
+                      <td className="px-3 py-2 text-sm">{med.unit}</td>
+                      <td className="px-3 py-2 text-sm">{med.quantity}</td>
+                      <td className="px-3 py-2 text-sm">{med.days}</td>
+                    </tr>
+                  )
+                ) || <tr></tr>}
               </tbody>
             </table>
           </div>
@@ -541,8 +577,12 @@ const MedicalRecord = () => {
               <span className="text-2xl font-medium">Ngày tái khám</span>
               {appointmentData ? (
                 <div className="text-right">
-                  <div className="text-xl font-medium">{appointmentData.date}</div>
-                  <div className="text-sm text-gray-500">{appointmentData.time}</div>
+                  <div className="text-xl font-medium">
+                    {appointmentData.date}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {appointmentData.time}
+                  </div>
                 </div>
               ) : (
                 <button
@@ -558,7 +598,6 @@ const MedicalRecord = () => {
         </section>
       </div>
     </div>
-  )
-}
-
-export default MedicalRecord
+  );
+};
+export default MedicalRecord;

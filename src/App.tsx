@@ -1,11 +1,11 @@
 import { Route, Routes } from 'react-router-dom'
 import './App.css'
 import ClinicDashboard from './ClinicDashboard'
-import MedicalRecord from './MedicalResult';
 import Prescription from './Prescription';
 import Appointment from './Appointment';
 import Header from './components/Header'; // Import Header
 import Sidebar from './components/Sidebar';
+import MedicalRecord from './MedicalResult';
 
 function App() {
   return (
@@ -22,7 +22,7 @@ function App() {
         <main className="flex-1 bg-gray-100">
           <Routes>
             <Route path="/" element={<ClinicDashboard />} />
-            <Route path="/medical-record" element={<MedicalRecord />} />
+            <Route path="/medical-record" element={<MedicalRecord/>} />
             <Route path="/prescription" element={<Prescription />} />
 
             <Route path="/appointment" element={<Appointment />} />
