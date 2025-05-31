@@ -7,16 +7,29 @@ import { ChevronDown, Edit, Calendar, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import DiseaseSelect from "./handleinput";
 import SymptomSelect from "./handleinput2";
+
 const MedicalRecord = (): JSX.Element => {
-  // Add navigation
   const underline =
     "relative text-xl after:content-[''] after:absolute after:left-[-15px] after:bottom-[-4px] after:h-[2px] after:w-[calc(100%+30px)] after:bg-gray-200";
 
   const navigate = useNavigate();
 
-  // State for form fields
+  // State cho các field cần lưu
   const [formData, setFormData] = useState({
+    lyDoDenKham: "",
+    tienSuBenh: "",
+    trieuChung: "",
+    benhChinh: "", // Giả định từ DiseaseSelect
+    moTaTinhTrangChinh: "",
+    benhPhu: "", // Giả định từ SymptomSelect
+    moTaTinhTrangPhu: "",
     huongDieuTri: "",
+    ketQuaKham: "Đỡ", // Giá trị mặc định của select
+    ghiChu: "",
+    canNang: "",
+    chieuCao: "",
+    huyetAp: "",
+    nhipTim: "",
   });
   const [prescriptionData, setPrescriptionData] = useState<any>(null);
   const [appointmentData, setAppointmentData] = useState<any>(null);
@@ -24,6 +37,7 @@ const MedicalRecord = (): JSX.Element => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const huongDieuTriRef = useRef<HTMLTextAreaElement>(null);
 
+  // Tải dữ liệu từ localStorage khi component mount
   useEffect(() => {
     const loadData = () => {
       const savedPrescription = localStorage.getItem("prescriptionData");
@@ -35,38 +49,41 @@ const MedicalRecord = (): JSX.Element => {
       if (savedAppointment) {
         setAppointmentData(JSON.parse(savedAppointment));
       }
+
+      const savedFormData = localStorage.getItem("medicalRecordData");
+      if (savedFormData) {
+        setFormData(JSON.parse(savedFormData));
+      }
     };
 
-    // Load data initially
     loadData();
 
-    // Add event listener for when window gains focus (user comes back to tab)
     const handleFocus = () => {
       loadData();
     };
 
-    window.addEventListener("focus", handleFocus);
-
-    // Also listen for storage events (when localStorage changes in other tabs)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "prescriptionData" || e.key === "appointmentData") {
+      if (
+        e.key === "prescriptionData" ||
+        e.key === "appointmentData" ||
+        e.key === "medicalRecordData"
+      ) {
         loadData();
       }
     };
-
+    window.addEventListener("focus", handleFocus);
     window.addEventListener("storage", handleStorageChange);
 
-    // Cleanup
     return () => {
       window.removeEventListener("focus", handleFocus);
       window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
 
-  // Handle form field changes
+  // Xử lý thay đổi giá trị input/select/textarea
   const handleChange = (
     e: React.ChangeEvent<
-      HTMLTextAreaElement | HTMLInputElement | HTMLSelectElement
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
     const { name, value } = e.target;
@@ -76,46 +93,37 @@ const MedicalRecord = (): JSX.Element => {
     }));
   };
 
-  // Handle prescription button click
+  // Xử lý nút "Kê đơn thuốc"
   const handlePrescriptionClick = () => {
-    // Validate required fields before proceeding
     if (!formData.huongDieuTri?.trim()) {
       setShowAlert(true);
-      // Scroll to the treatment direction field
       setTimeout(() => {
         huongDieuTriRef.current?.focus();
       }, 100);
       return;
     }
-
-    // If validation passes, navigate to prescription page
     navigate("/prescription");
   };
 
-  // Handle appointment button click
+  // Xử lý nút "Hẹn tái khám"
   const handleAppointmentClick = () => {
-    // Validate required fields before proceeding
     if (!formData.huongDieuTri?.trim()) {
       setShowAlert(true);
-      // Scroll to the treatment direction field
       setTimeout(() => {
         huongDieuTriRef.current?.focus();
       }, 100);
       return;
     }
-
-    // If validation passes, navigate to appointment page
     navigate("/appointment");
   };
 
-  // Close alert
+  // Đóng alert
   const closeAlert = () => {
     setShowAlert(false);
   };
 
-  // Handle save button click
+  // Xử lý nút "Lưu"
   const handleSave = () => {
-    // Validate required fields before saving
     if (!formData.huongDieuTri?.trim()) {
       setShowAlert(true);
       setTimeout(() => {
@@ -124,11 +132,12 @@ const MedicalRecord = (): JSX.Element => {
       return;
     }
 
-    // If validation passes, show success modal
+    // Lưu dữ liệu vào localStorage
+    localStorage.setItem("medicalRecordData", JSON.stringify(formData));
     setShowSuccessModal(true);
   };
 
-  // Close success modal
+  // Đóng modal thành công
   const closeSuccessModal = () => {
     setShowSuccessModal(false);
   };
@@ -320,8 +329,10 @@ const MedicalRecord = (): JSX.Element => {
                     Lý do đến khám
                   </label>
                   <input
+                    name="lyDoDenKham"
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
-                    defaultValue=""
+                    value={formData.lyDoDenKham}
+                    onChange={handleChange}
                   />
                 </div>
                 <div className="col-span-3">
@@ -329,9 +340,10 @@ const MedicalRecord = (): JSX.Element => {
                     Tiền sử bệnh
                   </label>
                   <input
+                    name="tienSuBenh"
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
-                    defaultValue=""
-                    required
+                    value={formData.tienSuBenh}
+                    onChange={handleChange}
                   />
                 </div>
                 <div className="col-span-3">
@@ -339,9 +351,10 @@ const MedicalRecord = (): JSX.Element => {
                     Triệu chứng
                   </label>
                   <textarea
+                    name="trieuChung"
                     className="w-full border border-gray-300 rounded px-3 py-2 h-20 bg-blue-100"
-                    defaultValue=""
-                    required
+                    value={formData.trieuChung}
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -352,7 +365,12 @@ const MedicalRecord = (): JSX.Element => {
                     Bệnh chính <span className="text-red-500">*</span>
                   </label>
                   <div>
-                    <DiseaseSelect />
+                    <DiseaseSelect
+                      value={formData.benhChinh}
+                      onChange={(value: string) =>
+                        setFormData((prev) => ({ ...prev, benhChinh: value }))
+                      }
+                    />
                   </div>
                   <ChevronDown className="absolute right-3 top-10 h-4 w-4 text-gray-400" />
                 </div>
@@ -361,9 +379,10 @@ const MedicalRecord = (): JSX.Element => {
                     Mô tả tình trạng
                   </label>
                   <input
+                    name="moTaTinhTrangChinh"
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
-                    defaultValue=""
-                    required
+                    value={formData.moTaTinhTrangChinh}
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -374,7 +393,12 @@ const MedicalRecord = (): JSX.Element => {
                     Bệnh phụ
                   </label>
                   <div>
-                    <SymptomSelect />
+                    <SymptomSelect
+                      value={formData.benhPhu}
+                      onChange={(value: string) =>
+                        setFormData((prev) => ({ ...prev, benhPhu: value }))
+                      }
+                    />
                   </div>
                   <ChevronDown className="absolute right-3 top-10 h-4 w-4 text-gray-400" />
                 </div>
@@ -383,9 +407,10 @@ const MedicalRecord = (): JSX.Element => {
                     Mô tả tình trạng
                   </label>
                   <input
+                    name="moTaTinhTrangPhu"
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
-                    placeholder=""
-                    required
+                    value={formData.moTaTinhTrangPhu}
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -413,7 +438,12 @@ const MedicalRecord = (): JSX.Element => {
                     Kết quả khám
                   </label>
                   <div className="relative">
-                    <select className="w-full border border-gray-300 rounded px-3 py-2 appearance-none bg-blue-100">
+                    <select
+                      name="ketQuaKham"
+                      className="w-full border border-gray-300 rounded px-3 py-2 appearance-none bg-blue-100"
+                      value={formData.ketQuaKham}
+                      onChange={handleChange}
+                    >
                       <option>Đỡ</option>
                       <option>Không đỡ</option>
                       <option>Không rõ</option>
@@ -427,8 +457,10 @@ const MedicalRecord = (): JSX.Element => {
                     Ghi chú
                   </label>
                   <input
+                    name="ghiChu"
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-100"
-                    defaultValue=""
+                    value={formData.ghiChu}
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -448,8 +480,10 @@ const MedicalRecord = (): JSX.Element => {
                 <span className="text-sm font-medium">Cân nặng</span>
                 <div className="w-[60%] flex items-center gap-2 justify-end">
                   <input
+                    name="canNang"
                     className="flex-1 w-16 border border-gray-300 rounded px-2 py-1 bg-blue-100"
-                    defaultValue=""
+                    value={formData.canNang}
+                    onChange={handleChange}
                   />
                   <span className="text-sm text-gray-600 w-[25%]">kg</span>
                 </div>
@@ -458,8 +492,10 @@ const MedicalRecord = (): JSX.Element => {
                 <span className="text-sm font-medium">Chiều cao</span>
                 <div className="w-[60%] flex items-center gap-2 justify-end">
                   <input
+                    name="chieuCao"
                     className="flex-1 w-16 border border-gray-300 rounded px-2 py-1 bg-blue-100"
-                    defaultValue=""
+                    value={formData.chieuCao}
+                    onChange={handleChange}
                   />
                   <span className="text-sm text-gray-600 w-[25%]">cm</span>
                 </div>
@@ -468,8 +504,10 @@ const MedicalRecord = (): JSX.Element => {
                 <span className="text-sm font-medium">Huyết áp</span>
                 <div className="w-[60%] flex items-center gap-2 justify-end">
                   <input
+                    name="huyetAp"
                     className="flex-1 w-16 border border-gray-300 rounded px-2 py-1 bg-blue-100"
-                    defaultValue=""
+                    value={formData.huyetAp}
+                    onChange={handleChange}
                   />
                   <span className="text-sm text-gray-600 w-[25%]">mmHg</span>
                 </div>
@@ -478,8 +516,10 @@ const MedicalRecord = (): JSX.Element => {
                 <span className="text-sm font-medium">Nhịp tim</span>
                 <div className="w-[60%] flex items-center gap-2 justify-end">
                   <input
+                    name="nhipTim"
                     className="flex-1 w-16 border border-gray-300 rounded px-2 py-1 bg-blue-100"
-                    defaultValue=""
+                    value={formData.nhipTim}
+                    onChange={handleChange}
                   />
                   <span className="text-sm text-gray-600 w-[25%]">
                     lần/phút
@@ -518,7 +558,7 @@ const MedicalRecord = (): JSX.Element => {
         {/* KÊ ĐƠN THUỐC */}
         <section className="bg-white rounded-lg shadow-sm">
           <div className="relative text-xl after:content-[''] after:absolute after:left-[3px] after:bottom-[-4px] after:h-[2px] after:w-[calc(99%)] after:bg-gray-200 bg-white text-black px-4 py-2 rounded-t-lg flex items-center justify-between">
-            <h2 className="font-semibold ">KÊ ĐƠN THUỐC</h2>
+            <h2 className="font-semibold">KÊ ĐƠN THUỐC</h2>
             <button
               className="cursor-pointer"
               onClick={handlePrescriptionClick}
@@ -542,7 +582,7 @@ const MedicalRecord = (): JSX.Element => {
                   <th className="px-3 border-r-1 border-r-gray-400 py-2 text-left text-sm font-medium">
                     Số lượng
                   </th>
-                  <th className="px-3  py-2 text-left text-sm font-medium rounded-r-sm">
+                  <th className="px-3 py-2 text-left text-sm font-medium rounded-r-sm">
                     Số ngày
                   </th>
                 </tr>
@@ -568,7 +608,10 @@ const MedicalRecord = (): JSX.Element => {
         <section className="bg-white rounded-lg shadow-sm">
           <div className="relative text-xl after:content-[''] after:absolute after:left-[3px] after:bottom-[-4px] after:h-[2px] after:w-[calc(99%)] after:bg-gray-200 bg-white text-black px-4 py-2 rounded-t-lg flex items-center justify-between">
             <h2 className="font-semibold">HẸN TÁI KHÁM</h2>
-            <button className="cursor-pointer" onClick={handleAppointmentClick}>
+            <button
+              className="cursor-pointer"
+              onClick={handleAppointmentClick}
+            >
               <Edit className="h-4 w-4" />
             </button>
           </div>
@@ -600,4 +643,5 @@ const MedicalRecord = (): JSX.Element => {
     </div>
   );
 };
+
 export default MedicalRecord;

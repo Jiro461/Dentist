@@ -1,36 +1,64 @@
-import { useState, type ChangeEvent,  } from 'react';
-import { ChevronDown } from 'lucide-react'; // nếu dùng icon từ lucide
+import { useState, useEffect, type ChangeEvent } from 'react';
+import { ChevronDown } from 'lucide-react';
+
+interface SymptomSelectProps {
+  value?: string;
+  onChange: (value: string) => void;
+}
 
 const SYMPTOMS = [
-  'Đầy hơi', 'Ợ chua', 'Khó tiêu', 'Buồn nôn', 'Chướng bụng', 'Mệt mỏi', 'Chán ăn',
-  'Đau đầu', 'Chóng mặt', 'Mất ngủ', 'Đau dạ dày nhẹ', 'Viêm họng', 'Ho khan',
-  'Ngạt mũi', 'Khó thở nhẹ', 'Huyết áp thấp', 'Da xanh xao', 'Hạ đường huyết',
+  'Đầy hơi',
+  'Ợ chua',
+  'Khó tiêu',
+  'Buồn nôn',
+  'Chướng bụng',
+  'Mệt mỏi',
+  'Chán ăn',
+  'Đau đầu',
+  'Chóng mặt',
+  'Mất ngủ',
+  'Đau dạ dày nhẹ',
+  'Viêm họng',
+  'Ho khan',
+  'Ngạt mũi',
+  'Khó thở nhẹ',
+  'Huyết áp thấp',
+  'Da xanh xao',
+  'Hạ đường huyết',
 ];
 
-const SymptomSelect = () => {
-  const [inputValue, setInputValue] = useState<string>('');
+const SymptomSelect = ({ value = '', onChange }: SymptomSelectProps) => {
+  const [inputValue, setInputValue] = useState<string>(value);
   const [filteredOptions, setFilteredOptions] = useState<string[]>([]);
   const [showOptions, setShowOptions] = useState<boolean>(false);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  // Sync inputValue with value prop when it changes
+  useEffect(() => {
     setInputValue(value);
+  }, [value]);
 
-    if (value.trim() === '') {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+
+    if (newValue.trim() === '') {
       setFilteredOptions([]);
       setShowOptions(false);
     } else {
       const filtered = SYMPTOMS.filter((symptom) =>
-        symptom.toLowerCase().includes(value.toLowerCase())
+        symptom.toLowerCase().includes(newValue.toLowerCase())
       );
       setFilteredOptions(filtered);
       setShowOptions(true);
     }
+
+    onChange(newValue);
   };
 
   const handleSelectOption = (option: string) => {
     setInputValue(option);
     setShowOptions(false);
+    onChange(option);
   };
 
   const handleBlur = () => {
