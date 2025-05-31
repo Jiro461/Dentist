@@ -1,8 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { ChevronDown, ChevronUp, X, Plus } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { ChevronDown, X, Plus } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { Button } from "./components/ui/button"
+import { Input } from "./components/ui/input"
 
 interface Medication {
   id: number
@@ -18,37 +20,52 @@ interface Medication {
   expanded?: boolean
 }
 
-const Prescription = () => {
+interface MedicineOption {
+  id: string
+  name: string
+  unit: string
+  stock: number
+  expiryDate: string
+}
+
+// Mock medicine database
+const medicineDatabase: MedicineOption[] = [
+  { id: "1", name: "Paracetamol", unit: "Viên", stock: 5000, expiryDate: "2026-05-20" },
+  { id: "2", name: "Amoxicillin", unit: "Viên", stock: 10000, expiryDate: "2026-05-20" },
+  { id: "3", name: "Ibuprofen", unit: "Viên", stock: 8000, expiryDate: "2026-05-20" },
+  { id: "4", name: "Cetirizine", unit: "Viên", stock: 6000, expiryDate: "2026-05-20" },
+  { id: "5", name: "Omeprazole", unit: "Viên", stock: 12000, expiryDate: "2026-05-20" },
+  { id: "6", name: "Salbutamol", unit: "Viên", stock: 7000, expiryDate: "2026-05-20" },
+  { id: "7", name: "Vitamin C", unit: "Viên", stock: 3000, expiryDate: "2026-05-20" },
+  { id: "8", name: "Prednisolone", unit: "Viên", stock: 9000, expiryDate: "2026-05-20" },
+  { id: "9", name: "Metformin", unit: "Viên", stock: 10000, expiryDate: "2026-05-20" },
+  { id: "10", name: "Atorvastatin", unit: "Viên", stock: 15000, expiryDate: "2026-05-20" },
+];
+
+
+export default function PrescriptionPage() {
   const navigate = useNavigate()
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [expandedRow, setExpandedRow] = useState<number | null>(null)
-  const [totalCost, setTotalCost] = useState(50000)
+  const [totalCost, setTotalCost] = useState(0)
+  const [searchQuery, setSearchQuery] = useState<{ [key: number]: string }>({})
+  const [showDropdown, setShowDropdown] = useState<{ [key: number]: boolean }>({})
+  const [filteredMedicines, setFilteredMedicines] = useState<{ [key: number]: MedicineOption[] }>({})
+  const dropdownRefs = useRef<{ [key: number]: HTMLDivElement | null }>({})
 
+  // Initialize with one empty medication
   const [medications, setMedications] = useState<Medication[]>([
     {
       id: 1,
-      name: "Paracetamol",
-      unit: "Viên 500mg",
-      dosage: "Sáng 1 chiều 1",
-      quantity: 20,
-      days: 5,
-      usage: "Uống ngay khi sốt",
+      name: "",
+      unit: "",
+      dosage: "",
+      quantity: 0,
+      days: 0,
+      usage: "",
       instruction: "",
-      stock: 10000,
-      expiryDate: "18/09/2026",
-      expanded: false,
-    },
-    {
-      id: 2,
-      name: "Ibuprofen",
-      unit: "Viên 200 mg",
-      dosage: "Sáng 1 chiều 1",
-      quantity: 20,
-      days: 5,
-      usage: "Uống sau khi ăn",
-      instruction: "",
-      stock: 8500,
-      expiryDate: "15/12/2025",
+      stock: 0,
+      expiryDate: "",
       expanded: false,
     },
   ])
@@ -60,37 +77,63 @@ const Prescription = () => {
       const prescriptionData = JSON.parse(savedPrescription)
       if (prescriptionData.medications && prescriptionData.medications.length > 0) {
         setMedications(prescriptionData.medications)
-        setTotalCost(prescriptionData.totalCost || 50000)
+        setTotalCost(prescriptionData.totalCost || 0)
       }
     }
   }, [])
 
-  const toggleExpand = (id: number) => {
-    if (expandedRow === id) {
-      setExpandedRow(null)
-    } else {
-      setExpandedRow(id)
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      Object.keys(dropdownRefs.current).forEach((key) => {
+        const ref = dropdownRefs.current[Number.parseInt(key)]
+        if (ref && !ref.contains(event.target as Node)) {
+          setShowDropdown((prev) => ({ ...prev, [Number.parseInt(key)]: false }))
+        }
+      })
     }
-  }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   const handleSave = () => {
-    // Save prescription data to localStorage to sync with medical record
     const prescriptionData = {
       medications,
       totalCost,
       prescriptionId: "DT001",
       date: "20/05/2025",
-      doctor: "Nguyễn Thanh Hoài",
+      doctor: "Trần Văn Kiên",
     }
     localStorage.setItem("prescriptionData", JSON.stringify(prescriptionData))
     setShowSuccessModal(true)
   }
 
   const handleDelete = (id: number) => {
-    setMedications(medications.filter((med) => med.id !== id))
+    if (medications.length === 1) {
+      // If only one medication, reset it instead of deleting
+      setMedications([
+        {
+          id: 1,
+          name: "",
+          unit: "",
+          dosage: "",
+          quantity: 0,
+          days: 0,
+          usage: "",
+          instruction: "",
+          stock: 0,
+          expiryDate: "",
+          expanded: false,
+        },
+      ])
+    } else {
+      setMedications(medications.filter((med) => med.id !== id))
+    }
+
     // Recalculate total cost
     const remainingMeds = medications.filter((med) => med.id !== id)
-    const newTotal = remainingMeds.reduce((sum, med) => sum + med.quantity * 1000, 0) // Assuming 1000 VND per unit
+    const newTotal = remainingMeds.reduce((sum, med) => sum + med.quantity * 1000, 0)
     setTotalCost(newTotal)
   }
 
@@ -107,35 +150,76 @@ const Prescription = () => {
       instruction: "",
       stock: 0,
       expiryDate: "",
-      expanded: true,
+      expanded: false,
     }
     setMedications([...medications, newMedication])
-    setExpandedRow(newId)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updateMedication = (id: number, field: string, value: any) => {
+  const updateMedication = (id: number, field: keyof Medication, value: any): void => {
     setMedications(medications.map((med) => (med.id === id ? { ...med, [field]: value } : med)))
 
     // Recalculate total cost when quantity changes
     if (field === "quantity") {
       const updatedMeds = medications.map((med) => (med.id === id ? { ...med, [field]: value } : med))
-      const newTotal = updatedMeds.reduce((sum, med) => sum + med.quantity * 1000, 0)
+      const newTotal = updatedMeds.reduce((sum, med) => sum + (med.quantity || 0) * 1000, 0)
       setTotalCost(newTotal)
     }
   }
 
+  const handleMedicineSearch = (id: number, query: string): void => {
+    setSearchQuery((prev) => ({ ...prev, [id]: query }))
+    updateMedication(id, "name", query)
+
+    if (query.length > 0) {
+      const filtered: MedicineOption[] = medicineDatabase.filter((medicine) =>
+        medicine.name.toLowerCase().includes(query.toLowerCase()),
+      )
+      setFilteredMedicines((prev) => ({ ...prev, [id]: filtered }))
+      setShowDropdown((prev) => ({ ...prev, [id]: true }))
+    } else {
+      setShowDropdown((prev) => ({ ...prev, [id]: false }))
+    }
+  }
+
+  const selectMedicine = (medicationId: number, medicine: MedicineOption): void => {
+    setMedications((prevMedications) =>
+      prevMedications.map((med) =>
+        med.id === medicationId
+          ? {
+              ...med,
+              name: medicine.name,
+              unit: medicine.unit,
+              stock: medicine.stock,
+              expiryDate: medicine.expiryDate,
+            }
+          : med,
+      ),
+    )
+
+    setSearchQuery((prev) => ({ ...prev, [medicationId]: medicine.name }))
+    setShowDropdown((prev) => ({ ...prev, [medicationId]: false }))
+  }
+
   const handleBack = () => {
-    // Save current state before going back
     const prescriptionData = {
       medications,
       totalCost,
       prescriptionId: "DT001",
       date: "20/05/2025",
-      doctor: "Nguyễn Thanh Hoài",
+      doctor: "Trần Văn Kiên",
     }
     localStorage.setItem("prescriptionData", JSON.stringify(prescriptionData))
     navigate("/medical-record")
+  }
+
+  const handlePrint = () => {
+    window.print()
+  }
+
+  const formatDate = (dateString: string): string => {
+    if (!dateString) return ""
+    const date = new Date(dateString)
+    return date.toLocaleDateString("vi-VN")
   }
 
   return (
@@ -152,12 +236,12 @@ const Prescription = () => {
                 </svg>
               </div>
               <h3 className="text-xl font-medium text-blue-600 mb-6">Lưu đơn thuốc thành công!</h3>
-              <button
+              <Button
                 onClick={() => setShowSuccessModal(false)}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-2 rounded font-medium"
               >
                 Đóng
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -165,15 +249,27 @@ const Prescription = () => {
 
       {/* Print controls */}
       <div className="flex justify-end mb-4 gap-2">
-        <button className="flex items-center gap-1 text-gray-600 hover:text-gray-800" onClick={handleSave}>
+        <Button
+          variant="ghost"
+          className="flex items-center gap-1 text-gray-600 hover:text-gray-800"
+          onClick={handleSave}
+        >
           <span>📄</span> Lưu
-        </button>
-        <button className="flex items-center gap-1 text-gray-600 hover:text-gray-800">
+        </Button>
+        <Button
+          variant="ghost"
+          className="flex items-center gap-1 text-gray-600 hover:text-gray-800"
+          onClick={handlePrint}
+        >
           <span>🖨️</span> In
-        </button>
-        <button className="flex items-center gap-1 text-gray-600 hover:text-gray-800" onClick={handleBack}>
+        </Button>
+        <Button
+          variant="ghost"
+          className="flex items-center gap-1 text-gray-600 hover:text-gray-800"
+          onClick={handleBack}
+        >
           <span>✕</span> Đóng
-        </button>
+        </Button>
       </div>
 
       {/* Patient info */}
@@ -182,41 +278,36 @@ const Prescription = () => {
       </div>
 
       {/* Prescription info */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
-          <label className="block text-sm font-medium mb-1">Mã đơn thuốc</label>
-          <input
-            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-            defaultValue="DT001"
-            readOnly
-          />
+          <label htmlFor="prescription-id" className="block text-sm font-medium mb-1">
+            Mã đơn thuốc
+          </label>
+          <Input id="prescription-id" className="w-full bg-gray-100 border-0" defaultValue="DT001" readOnly />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Ngày kê đơn</label>
-          <input
-            className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
-            defaultValue="20/05/2025"
-            readOnly
-          />
+          <label htmlFor="prescription-date" className="block text-sm font-medium mb-1">
+            Ngày kê đơn
+          </label>
+          <Input id="prescription-date" className="w-full bg-gray-100 border-0" defaultValue="20/05/2025" readOnly />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Bác sĩ kê đơn</label>
-          <input
-            className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-50"
-            defaultValue="Nguyễn Thanh Hoài"
-          />
+          <label htmlFor="doctor-name" className="block text-sm font-medium mb-1">
+            Bác sĩ kê đơn
+          </label>
+          <Input id="doctor-name" className="w-full bg-blue-50 border-0" defaultValue="Trần Văn Kiên" />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Nơi lĩnh thuốc</label>
-          <input className="w-full border border-gray-300 rounded px-3 py-2 bg-blue-50" defaultValue="Quầy dược" />
+          <label htmlFor="pharmacy-location" className="block text-sm font-medium mb-1">
+            Nơi lĩnh thuốc
+          </label>
+          <Input id="pharmacy-location" className="w-full bg-blue-50 border-0" defaultValue="Quầy dược" />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Tổng chi phí</label>
-          <input
-            className="w-full border border-gray-300 rounded px-3 py-2"
-            value={totalCost.toLocaleString()}
-            readOnly
-          />
+          <label htmlFor="total-cost" className="block text-sm font-medium mb-1">
+            Tổng chi phí
+          </label>
+          <Input id="total-cost" className="w-full border-0" value={totalCost.toLocaleString()} readOnly />
         </div>
       </div>
 
@@ -247,106 +338,142 @@ const Prescription = () => {
                     <td className="px-4 py-3 text-sm">{index + 1}</td>
                     <td className="px-4 py-3 text-sm">
                       <div className="flex items-center">
-                        {med.name || "Chưa chọn thuốc"}
-                        <button className="ml-2 text-gray-500 hover:text-gray-700" onClick={() => toggleExpand(med.id)}>
-                          {expandedRow === med.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                        </button>
+                        <div
+                          className=" flex-1"
+                          ref={(el) => {
+                            dropdownRefs.current[med.id] = el
+                          }}
+                        >
+                          <Input
+                            className="w-full text-sm bg-white border-0"
+                            value={searchQuery[med.id] || med.name}
+                            onChange={(e) => handleMedicineSearch(med.id, e.target.value)}
+                          />
+
+                          {/* Medicine dropdown */}
+                          {showDropdown[med.id] &&
+                            filteredMedicines[med.id] &&
+                            filteredMedicines[med.id].length > 0 && (
+                              <div
+                                className="absolute mt-1 z-50 bg-white border border-gray-500 rounded-lg shadow-lg"
+                                style={{ width: "calc(50% - 2rem)", maxHeight: "300px", overflowY: "auto" }}
+                              >
+                                <div className="top-0 border-b border-gray-500 bg-black/6">
+                                  <div className="grid grid-cols-4 text-sm font-medium text-gray-900">
+                                    <div className="px-4 border-r font-semibold border-gray-500">Tên thuốc</div>
+                                    <div className="px-4 border-r font-semibold border-gray-500">Đơn vị tính</div>
+                                    <div className="px-4 border-r font-semibold border-gray-500">Tồn kho</div>
+                                    <div className="px-4 font-semibold border-gray-500">Hạn dùng</div>
+                                  </div>
+                                </div>
+                                {filteredMedicines[med.id].map((medicine, index) => (
+                                  <div
+                                    key={medicine.id}
+                                    className={`grid grid-cols-4 text-sm hover:bg-blue-50 cursor-pointer ${index > 0 ? "border-t" : ""}`}
+                                    onClick={() => selectMedicine(med.id, medicine)}
+                                  >
+                                    <div className="px-4 py-[1px] border-r">{medicine.name}</div>
+                                    <div className="px-4 py-[1px] border-r">{medicine.unit}</div>
+                                    <div className="px-4 py-[1px] border-r">{medicine.stock}</div>
+                                    <div className="px-4 py-[1px]">{formatDate(medicine.expiryDate)}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                        </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm">{med.unit}</td>
-                    <td className="px-4 py-3 text-sm">{med.quantity}</td>
-                    <td className="px-4 py-3 text-sm">{med.days}</td>
-                    <td className="px-4 py-3 text-sm">{med.dosage}</td>
-                    <td className="px-4 py-3 text-sm">{med.usage}</td>
-                    <td className="px-4 py-3 text-sm text-center">
-                      <button className="text-gray-500 hover:text-red-500" onClick={() => handleDelete(med.id)}>
-                        <X size={16} />
-                      </button>
+                    <td className="px-4 py-3 text-sm">
+                      <Input className="w-full text-sm bg-gray-100 border-0" value={med.unit || ""} readOnly />
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <Input
+                        className="w-full text-sm bg-white border-0"
+                        type="number"
+                        value={med.quantity || ""}
+                        onChange={(e) => updateMedication(med.id, "quantity", Number.parseInt(e.target.value) || 0)}
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <Input
+                        className="w-full text-sm bg-white border-0"
+                        type="number"
+                        value={med.days || ""}
+                        onChange={(e) => updateMedication(med.id, "days", Number.parseInt(e.target.value) || 0)}
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <Input
+                        className="w-full text-sm bg-white border-0"
+                        value={med.dosage}
+                        onChange={(e) => updateMedication(med.id, "dosage", e.target.value)}
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <Input
+                        className="w-full text-sm bg-white border-0"
+                        value={med.usage}
+                        onChange={(e) => updateMedication(med.id, "usage", e.target.value)}
+                      />
                     </td>
                     <td className="px-4 py-3 text-sm text-center">
-                      <button className="text-gray-500 hover:text-blue-500" onClick={handleAdd}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="p-0 h-auto text-gray-500 hover:text-red-500"
+                        onClick={() => handleDelete(med.id)}
+                      >
+                        <X size={16} />
+                      </Button>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="p-0 h-auto text-gray-500 hover:text-blue-500"
+                        onClick={handleAdd}
+                      >
                         <Plus size={16} />
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                   {expandedRow === med.id && (
                     <tr className="bg-gray-50">
                       <td colSpan={9} className="px-4 py-3">
-                        <div className="grid grid-cols-4 gap-4 p-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-2">
                           <div>
-                            <label className="block text-xs font-medium mb-1">Tên thuốc</label>
-                            <input
-                              className="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-blue-50"
-                              value={med.name}
-                              onChange={(e) => updateMedication(med.id, "name", e.target.value)}
-                              placeholder="Nhập tên thuốc"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium mb-1">Đơn vị tính</label>
-                            <input
-                              className="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-blue-50"
-                              value={med.unit}
-                              onChange={(e) => updateMedication(med.id, "unit", e.target.value)}
-                              placeholder="VD: Viên, Gói, Chai"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium mb-1">Tồn kho</label>
-                            <input
-                              className="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-gray-100"
+                            <label htmlFor={`med-stock-${med.id}`} className="block text-xs font-medium mb-1">
+                              Tồn kho
+                            </label>
+                            <Input
+                              id={`med-stock-${med.id}`}
+                              className="w-full text-sm bg-gray-100 border-0"
                               type="number"
                               value={med.stock || 0}
                               readOnly
-                              onChange={(e) => updateMedication(med.id, "stock", Number.parseInt(e.target.value) || 0)}
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium mb-1">Hạn dùng</label>
-                            <input
-                              className="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-gray-100"
+                            <label htmlFor={`med-expiry-${med.id}`} className="block text-xs font-medium mb-1">
+                              Hạn dùng
+                            </label>
+                            <Input
+                              id={`med-expiry-${med.id}`}
+                              className="w-full text-sm bg-gray-100 border-0"
                               type="date"
                               value={med.expiryDate}
                               readOnly
-                              onChange={(e) => updateMedication(med.id, "expiryDate", e.target.value)}
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium mb-1">Số lượng</label>
-                            <input
-                              className="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-blue-50"
-                              type="number"
-                              value={med.quantity}
-                              onChange={(e) =>
-                                updateMedication(med.id, "quantity", Number.parseInt(e.target.value) || 0)
-                              }
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium mb-1">Số ngày</label>
-                            <input
-                              className="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-blue-50"
-                              type="number"
-                              value={med.days}
-                              onChange={(e) => updateMedication(med.id, "days", Number.parseInt(e.target.value) || 0)}
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium mb-1">Liều dùng</label>
-                            <input
-                              className="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-blue-50"
-                              value={med.dosage}
-                              onChange={(e) => updateMedication(med.id, "dosage", e.target.value)}
-                              placeholder="VD: Sáng 1 chiều 1"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium mb-1">Cách dùng</label>
-                            <input
-                              className="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-blue-50"
-                              value={med.usage}
-                              onChange={(e) => updateMedication(med.id, "usage", e.target.value)}
-                              placeholder="VD: Uống sau khi ăn"
+                            <label htmlFor={`med-instruction-${med.id}`} className="block text-xs font-medium mb-1">
+                              Ghi chú
+                            </label>
+                            <Input
+                              id={`med-instruction-${med.id}`}
+                              className="w-full text-sm bg-white border-0"
+                              value={med.instruction}
+                              onChange={(e) => updateMedication(med.id, "instruction", e.target.value)}
                             />
                           </div>
                         </div>
@@ -363,17 +490,16 @@ const Prescription = () => {
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <button className="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300">
+          <Button variant="outline" size="sm" disabled>
             <ChevronDown className="rotate-90" size={16} />
-          </button>
+          </Button>
           <span className="text-sm">Page 1 of 1</span>
-          <button className="px-3 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200">
-            <ChevronDown className="rotate-270" size={16} />
-          </button>
+          <Button variant="outline" size="sm" disabled>
+            <ChevronDown className="rotate-[270deg]" size={16} />
+          </Button>
         </div>
+        <div className="text-sm text-gray-600">Tổng số thuốc: {medications.length}</div>
       </div>
     </div>
   )
 }
-
-export default Prescription
