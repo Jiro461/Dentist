@@ -46,7 +46,7 @@ const medicineDatabase: MedicineOption[] = [
 export default function PrescriptionPage() {
   const navigate = useNavigate()
   const [showSuccessModal, setShowSuccessModal] = useState(false)
-  const [expandedRow, setExpandedRow] = useState<number | null>(null)
+  const [expandedRow] = useState<number | null>(null)
   const [totalCost, setTotalCost] = useState(0)
   const [searchQuery, setSearchQuery] = useState<{ [key: number]: string }>({})
   const [showDropdown, setShowDropdown] = useState<{ [key: number]: boolean }>({})
