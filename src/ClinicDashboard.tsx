@@ -195,7 +195,7 @@ export default function PatientList() {
         {showAdvancedFilter && (
         <>
           {/* Overlay mờ nền */}
-           <div className="fixed inset-0 bg-grey backdrop-blur-sm z-10" 
+           <div className="fixed inset-0 bg-black/5 backdrop-blur-sm z-10" 
            onClick={() => setShowAdvancedFilter(false)} />
           <div
             className="absolute  right-10 z-20 w-[60%] mb-6 p-4 bg-white border rounded-lg "
@@ -263,18 +263,18 @@ export default function PatientList() {
                     </Button>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center border rounded-lg bg-white">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex flex-1 items-center border rounded-lg bg-white">
                       <div className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 border-r min-w-[120px]">
                         Ngày khám
                       </div>
                       <Input
                         type="date"
-                        className="flex-1 border-0 shadow-none focus:ring-0"
+                        className="border-0 shadow-none focus:ring-0"
                         value={
                           filters.examDate === "all" ? "" : filters.examDate
                         }
-                        onChange={(e) =>
+                        onChange={(e) =>  
                           setFilters({ ...filters, examDate: e.target.value })
                         }
                       />
